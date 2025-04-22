@@ -1,10 +1,6 @@
 name: 刷步数
 
 on:
-  #push:
-  #  branches: [ main ]
-  #pull_request:
-  #  branches: [ main ]
   schedule:
     - cron: '44 0,4,7,10,12,14 * * *'
   watch:
@@ -14,19 +10,28 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    # 添加全局权限配置（确保GitHub Token有权限）
+    permissions:
+      contents: read  # 允许读取仓库代码
+      actions: read    # 允许读取Actions配置
+
     steps:
-      - name: Checkout codes
-        uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v4  # 升级到v4版本
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}  # 使用自定义Token（需提前配置）
+
       - name: Update system and install zsh
         run: |
           sudo -E apt-get -qq update
           sudo -E apt-get install zsh -y
-          
+
       - name: 初始化Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-          
+
       - name: 开始
         run: |
           pip3 install requests
