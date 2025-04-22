@@ -34,9 +34,11 @@ jobs:
 
       - name: 开始
         run: |
-          pip3 install requests
+          pip3 install requests==2.32.3 urllib3==2.2.3  # 固定版本避免兼容性问题
           user='${{ secrets.USER }}'
           passwd='${{ secrets.PWD }}' 
           open_get_weather='${{ secrets.OPEN_GET_WEATHER }}'
           area='${{ secrets.AREA }}'
+          # 添加高德API Key环境变量
+          export GAODE_API_KEY=${{ secrets.GAODE_API_KEY }}
           python3 main.py ${user} ${passwd} ${open_get_weather} ${area}
