@@ -220,10 +220,17 @@ def main(_user, _passwd, min_1, max_1):
 
 # 获取时间戳
 def get_time():
-    url = 'http://quan.suning.com/getSysTime.do'
-    response = requests.get(url, headers=headers).json()
-    t = response['sysTime1']
-    return t
+    try:
+        # 使用国家授时中心API
+        url = 'http://api.m.taobao.com/rest/api3.do?api=mtop.common.getTimestamp'
+        headers = {"User-Agent": "Mozilla/5.0"}
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        return str(response.json()['data']['t'])
+    except Exception as e:
+        print(f"获取时间失败: {str(e)}")
+        # 备选方案：直接生成当前时间戳
+        return str(int(time.time() * 1000))
 
 
 # 获取app_token
