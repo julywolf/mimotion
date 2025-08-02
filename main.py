@@ -69,17 +69,34 @@ def getBeijinTime():
     if open_get_weather == "True":
         getWeather()
     r = requests.get(url=url, headers=hea)
-    if r.status_code == 200:
+        if r.status_code == 200:
+        # 直接设置固定步数范围
+        base_min = 5000
+        base_max = 7000
+        
+        # 根据时间微调范围（可选）
         result = r.text
         pattern = re.compile('\\d{4}-\\d{2}-\\d{2} (\\d{2}):\\d{2}:\\d{2}')
         find = re.search(pattern, result)
-        hour = find.group(1)
-        min_ratio = max(math.ceil((int(hour) / 3) - 1), 0)
-        max_ratio = math.ceil(int(hour) / 3)
-        min_1 = 3500 * min_ratio
-        max_1 = 3500 * max_ratio
-        min_1 = int(K * min_1)
-        max_1 = int(K * max_1)
+        if find:
+            hour = int(find.group(1))
+            # 北京时间18/20/22时分别设置不同范围
+            if hour == 18:   # UTC 10:44
+                min_1 = base_min
+                max_1 = base_max
+            elif hour == 20: # UTC 12:44
+                min_1 = base_min + 2000
+                max_1 = base_max + 1000
+            elif hour == 22: # UTC 14:44
+                min_1 = base_min+ 3000
+                max_1 = base_max + 8000
+            else:
+                min_1 = base_min
+                max_1 = base_max
+        else:
+            min_1 = base_min
+            max_1 = base_max
+        
     else:
         print("获取北京时间失败")
         return
