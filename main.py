@@ -69,7 +69,7 @@ def getBeijinTime():
     if open_get_weather == "True":
         getWeather()
     r = requests.get(url=url, headers=hea)
-        if r.status_code == 200:
+    if r.status_code == 200:
         # 直接设置固定步数范围
         base_min = 5000
         base_max = 7000
