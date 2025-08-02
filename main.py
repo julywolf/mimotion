@@ -61,45 +61,61 @@ def getWeather():
 
 # 获取北京时间确定随机步数&启动主函数
 def getBeijinTime():
-    global K, type
+    global K, type, min_1, max_1
     K = 1.0
     type = ""
+    min_1 = 0
+    max_1 = 0
+    
     hea = {'User-Agent': 'Mozilla/5.0'}
     url = r'https://apps.game.qq.com/CommArticle/app/reg/gdate.php'
     if open_get_weather == "True":
         getWeather()
+    
     r = requests.get(url=url, headers=hea)
     if r.status_code == 200:
-    # 直接设置固定步数范围
-    base_min = 5000
-    base_max = 7000
-    
-    # 根据时间微调范围（可选）
-    result = r.text
-    pattern = re.compile('\\d{4}-\\d{2}-\\d{2} (\\d{2}):\\d{2}:\\d{2}')
-    find = re.search(pattern, result)
-    if find:
-        hour = int(find.group(1))
-        # 北京时间18/20/22时分别设置不同范围
-        if hour == 18:   # UTC 10:44
-            min_1 = base_min
-            max_1 = base_max
-        elif hour == 20: # UTC 12:44
-            min_1 = base_min + 2000
-            max_1 = base_max + 1000
-        elif hour == 22: # UTC 14:44
-            min_1 = base_min + 3000
-            max_1 = base_max + 8000
+        # 直接设置固定步数范围
+        base_min = 5000
+        base_max = 7000
+        
+        # 根据时间微调范围（可选）
+        result = r.text
+        pattern = re.compile('\\d{4}-\\d{2}-\\d{2} (\\d{2}):\\d{2}:\\d{2}')
+        find = re.search(pattern, result)
+        if find:
+            hour = int(find.group(1))
+            # 北京时间18/20/22时分别设置不同范围
+            if hour == 18:   # UTC 10:44
+                min_1 = base_min
+                max_1 = base_max
+            elif hour == 20: # UTC 12:44
+                min_1 = base_min + 2000
+                max_1 = base_max + 1000
+            elif hour == 22: # UTC 14:44
+                min_1 = base_min + 3000
+                max_1 = base_max + 8000
+            else:
+                min_1 = base_min
+                max_1 = base_max
         else:
             min_1 = base_min
             max_1 = base_max
-    else:
-        min_1 = base_min
-        max_1 = base_max
         
+        # 应用天气系数
+        min_1 = int(K * min_1)
+        max_1 = int(K * max_1)
+        
+        # 确保范围有效
+        if min_1 < 0 or max_1 < min_1:
+            print("步数范围无效，使用默认值")
+            min_1 = 5000
+            max_1 = 7000
     else:
         print("获取北京时间失败")
-        return
+        # 设置默认值
+        min_1 = 5000
+        max_1 = 7000
+    
     if min_1 != 0 and max_1 != 0:
         user_mi = sys.argv[1]
         # 登录密码
@@ -113,10 +129,9 @@ def getBeijinTime():
                 msg_mi = ""
             for user_mi, passwd_mi in zip(user_list, passwd_list):
                 msg_mi += main(user_mi, passwd_mi, min_1, max_1)
-                # print(msg_mi)
+            print(f"本次运行结束，步数范围: {min_1}-{max_1}")
     else:
         print("当前主人设置了0步数呢，本次不提交")
-        return
 
 
 # 获取登录code
