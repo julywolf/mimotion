@@ -85,13 +85,13 @@ def getBeijinTime():
         if find:
             hour = int(find.group(1))
             # 北京时间18/20/22时分别设置不同范围
-            if hour == 18:   # UTC 10:44
+            if hour >= 18 and hour < 20 :   # UTC 10:44
                 min_1 = base_min
                 max_1 = base_max
-            elif hour == 20: # UTC 12:44
+            elif hour >= 20 and hour < 22: # UTC 12:44
                 min_1 = base_min + 2000
                 max_1 = base_max + 1000
-            elif hour == 22: # UTC 14:44
+            elif hour >= 22 and hour < 24: # UTC 14:44
                 min_1 = base_min + 3000
                 max_1 = base_max + 8000
             else:
